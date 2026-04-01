@@ -1,0 +1,40 @@
+---
+title: "load_and_clean_data"
+output: pdf_document
+---
+
+```{r}
+library(dplyr)
+```
+
+Load data files
+
+```{r q1}
+team_stats <- read.csv("teamStats.csv")
+standings <- read.csv("standings.csv")
+```
+
+delete data whose both standings and teamStats are missing
+
+```{r q2}
+joined_data <- left_join(team_stats, standings,
+                         by = c("teamId","seasonType"))
+joined_data
+joined_data_clean <- joined_data[rowSums(is.na(joined_data)) != 47, ]
+joined_data_clean
+```
+
+change the category of some variables, not including times
+
+```{r q3}
+joined_data_clean <- joined_data_clean %>%
+    mutate(across(c(seasonType:teamOrder, year, leagueId), as.factor))
+joined_data_clean <- joined_data_clean %>%
+    mutate(across(c(foulsCommitted:shotsOnTarget,penaltyKickGoals:totalPasses,accurateCrosses,totalCrosses,totalLongBalls,accurateLongBalls,blockedShots:totalTackles,interceptions:totalClearance,gf,ga,clean_sheet), as.integer))
+joined_data_clean <- joined_data_clean %>%
+    mutate(across(next_opponent, as.factor))
+joined_data_clean <- joined_data_clean %>%
+    mutate(across(next_homeAway, as.factor))
+joined_data_clean
+```
+
